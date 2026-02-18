@@ -37,7 +37,7 @@ namespace Lab01_SadieP
         /// </summary>
         /// <param name="package">the package this package is being checked against</param>
         /// <returns>true if they intersect, false if they don't</returns>
-        public bool Intersects (Package package)
+        public bool Intersects(Package package)
         {
             for (int i = 0; i < _lines.Count; i++)
             {
@@ -45,7 +45,7 @@ namespace Lab01_SadieP
                 Point aEnd; //end of the line segment being checked
 
                 //if the start is the last point of _lines, set the end point to the first point of _lines
-                if (i == _lines.Count  - 1)
+                if (i == _lines.Count - 1)
                     aEnd = _lines[0];
                 else
                     aEnd = _lines[i + 1];
@@ -60,7 +60,7 @@ namespace Lab01_SadieP
                         bEnd = package._lines[0];
                     else
                         bEnd = package._lines[j + 1];
-                    
+
                     //if the lines intersect, return true because the package intersect
                     if (LineIntersects(aStart, aEnd, bStart, bEnd))
                         return true;
@@ -160,6 +160,57 @@ namespace Lab01_SadieP
                 //add the line segment to the canvas with the package's color
                 Canvas.AddLine(start.X, start.Y, end.X, end.Y, _color);
             }
+        }
+
+        /// <summary>
+        /// moves the package to a new random location wholly on the canvas
+        /// </summary>
+        /// <param name="Canvas">the Canvas the package is being drawn on</param>
+        public void NewLocation(CDrawer Canvas)
+        {
+            do
+            {
+                //generate a random point on the canvas to be the new starting point of this package
+                Point newStart = new Point(_rnd.Next(0, Canvas.ScaledWidth), _rnd.Next(0, Canvas.ScaledHeight)); 
+
+                //finds the difference between the current starting point of the package and the new starting point
+                Point diff = new Point(newStart.X - _lines[0].X, _lines[0].Y - newStart.Y);
+                
+                //create a new list to hold the new points
+                List<Point> newPoints = new List<Point>();
+
+                //go through every point in _lines and add the difference
+                foreach (Point p in _lines)
+                {
+                    //create a new point by adding the difference to the current point
+                    Point newPoint = new Point(p.X + diff.X, p.Y + diff.Y);
+
+                    //add the new point to the list of new points
+                    newPoints.Add(newPoint);
+                }
+                //set _lines to the new list of points
+                _lines = newPoints;
+
+            //keep running until the new location of the package is fully on the canvas
+            } while (!InBounds(Canvas));
+        }
+
+        /// <summary>
+        /// determines if all the points in this package are within the bounds of the package
+        /// </summary>
+        /// <param name="Canvas">the canvas the package is being drawn on</param>
+        /// <returns>true if the package is fully on the canvas</returns>
+        public bool InBounds(CDrawer Canvas)
+        {
+            //check through all the points in this package
+            foreach (Point p in _lines)
+            {
+                //check if the point is out of the canvas bounds, if it is return false
+                if (p.X < 0 || p.X > Canvas.ScaledWidth || p.Y < 0 || p.Y > Canvas.ScaledHeight)
+                    return false;
+            }
+            //if every point is in bounds, return true
+            return true;
         }
     }
 }
