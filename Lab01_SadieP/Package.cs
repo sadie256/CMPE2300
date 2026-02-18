@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GDIDrawer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -71,7 +72,8 @@ namespace Lab01_SadieP
 
 
 
-        /* CITATION ICA04
+        /* CITATION ICA04:
+         *
          * Code for this method was copied from ICA04 and tweaked to fit this method
          * 
          * Original code below:
@@ -136,6 +138,28 @@ namespace Lab01_SadieP
             }
 
             return false; // No intersection within the segments
+        }
+
+        /// <summary>
+        /// draws this package on the given CDrawing canvas using the package's color and lines
+        /// </summary>
+        /// <param name="Canvas">the CDrawer object the package is being drawn on</param>
+        public void Draw(CDrawer Canvas)
+        {
+            for (int i = 0; i < _lines.Count; i++)
+            {
+                Point start = _lines[i]; //the start of the line segment being drawn
+                Point end; //end of the line segment being drawn
+
+                //if the start is the last point of _lines, set the end point to the first point of _lines
+                if (i == _lines.Count - 1)
+                    end = _lines[0];
+                else
+                    end = _lines[i + 1];
+
+                //add the line segment to the canvas with the package's color
+                Canvas.AddLine(start.X, start.Y, end.X, end.Y, _color);
+            }
         }
     }
 }
