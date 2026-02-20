@@ -212,5 +212,76 @@ namespace Lab01_SadieP
             //if every point is in bounds, return true
             return true;
         }
+
+        /// <summary>
+        /// checks if the given package is inside of this package
+        /// </summary>
+        /// <param name="package">the package that may be inside of this pagkage</param>
+        /// <returns>true if this package contains the given package</returns>
+        public bool ContainsPackage(Package package)
+        {
+            //get the center point by avveraging the x and y values of all points in _lines
+            Point center = new Point(0,0);
+
+            //sum the X and Y values fore each point in _lines
+            foreach (Point p in _lines)
+            {
+                center.X += p.X;
+                center.Y += p.Y;
+            }
+
+            //divide the X and Y values by the number of points to get the average
+            center.X /= _lines.Count;
+            center.Y /= _lines.Count;
+
+            //for each line segment in the given package
+            for( int i = 0; i < package._lines.Count; i++)
+            {
+                Point start = package._lines[i]; //the start of the line segment being checked
+                Point end; //end of the line segment being checked
+
+                //if the start is the last point of package._lines, set the end point to the first point of package._lines
+                if (i == package._lines.Count - 1)
+                    end = package._lines[0];
+                else
+                    end = package._lines[i + 1];
+
+                //check if the line from center to every point on this package intersects the corrent line
+                foreach (Point edge in _lines)
+                {
+                    //if they intersect, return true because the package is inside this package
+                    if (LineIntersects(center, center, start, end))
+                        return true;
+                }
+            }
+            //if none of the line segments intersect with the line between the center and edge
+            return false;
+        }
+
+        /// <summary>
+        /// checks if the package is equal with another object
+        /// </summary>
+        /// <param name="obj">object he package is being compared to</param>
+        /// <returns>true if they are both packages and they intersect or if either package is inside the other</returns>
+        public override bool Equals(object? obj)
+        {
+            //convert the object to a package
+            Package p = obj as Package;
+
+            //if p is not null and this package doesn't intersect with p and this package doesn't contain p and p doesn't contain this package, return false because they are not equal. Otherwise, return true because they are equal
+            if (p != null && !Intersects(p) && !ContainsPackage(p) && !p.ContainsPackage(this))
+                return false;
+            else
+                return true;
+        }
+
+        /// <summary>
+        /// get hash code override
+        /// </summary>
+        /// <returns>base hashcode</returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }
