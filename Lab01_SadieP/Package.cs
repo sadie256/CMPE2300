@@ -29,6 +29,35 @@ namespace Lab01_SadieP
         /// <param name="packageString">string describing the package parameters</param>
         public Package(string packageString)
         {
+            //split string by commas to get columns from .csv
+            string[] cols = packageString.Split(',');
+
+            //initialize _lines list
+            _lines = new List<Point>();
+
+            //try to parse _id from col 0
+            if (!int.TryParse(cols[0].Trim(), out _id))
+                throw new Exception("ID is not a valid integer");
+
+            //get the colour from column 1
+            if (!int.TryParse(cols[1].Trim(), System.Globalization.NumberStyles.HexNumber, null, out int hexColor))
+                throw new Exception("Color is not a valid hex number");
+            else
+                _color = Color.FromArgb(hexColor);
+
+            //parse the data from col 2 in pairs to get points for _lines
+            for (int i = 2; i < cols.Length; i += 2)
+            {
+                //if X and Y are valid, make and add a point, otherwise throw exception
+                if (int.TryParse(cols[i].Trim(), out int x) && int.TryParse(cols[i + 1].Trim(), out int y))
+                {
+                    _lines.Add(new Point(x, y));
+                }
+                else
+                {
+                    throw new Exception($"Point {i / 2 - 1} is not valid");
+                }
+            }
 
         }
 
