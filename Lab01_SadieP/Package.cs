@@ -187,7 +187,7 @@ namespace Lab01_SadieP
                     end = _lines[i + 1];
 
                 //add the line segment to the canvas with the package's color
-                Canvas.AddLine(start.X, start.Y, end.X, end.Y, _color);
+                Canvas.AddLine(start.X + Location.X, start.Y + Location.Y, end.X + Location.X, end.Y + Location.Y, _color);
             }
         }
 
@@ -200,25 +200,9 @@ namespace Lab01_SadieP
             do
             {
                 //generate a random point on the canvas to be the new starting point of this package
-                Point newStart = new Point(_rnd.Next(0, Canvas.ScaledWidth), _rnd.Next(0, Canvas.ScaledHeight)); 
+                Location = new Point(_rnd.Next(0, Canvas.ScaledWidth), _rnd.Next(0, Canvas.ScaledHeight)); 
 
-                //finds the difference between the current starting point of the package and the new starting point
-                Point diff = new Point(newStart.X - _lines[0].X, _lines[0].Y - newStart.Y);
-                
-                //create a new list to hold the new points
-                List<Point> newPoints = new List<Point>();
 
-                //go through every point in _lines and add the difference
-                foreach (Point p in _lines)
-                {
-                    //create a new point by adding the difference to the current point
-                    Point newPoint = new Point(p.X + diff.X, p.Y + diff.Y);
-
-                    //add the new point to the list of new points
-                    newPoints.Add(newPoint);
-                }
-                //set _lines to the new list of points
-                _lines = newPoints;
 
             //keep running until the new location of the package is fully on the canvas
             } while (!InBounds(Canvas));
@@ -235,7 +219,7 @@ namespace Lab01_SadieP
             foreach (Point p in _lines)
             {
                 //check if the point is out of the canvas bounds, if it is return false
-                if (p.X < 0 || p.X > Canvas.ScaledWidth || p.Y < 0 || p.Y > Canvas.ScaledHeight)
+                if (p.X + Location.X < 0 || p.X + Location.X > Canvas.ScaledWidth || p.Y + Location.Y < 0 || p.Y + Location.Y > Canvas.ScaledHeight)
                     return false;
             }
             //if every point is in bounds, return true
@@ -249,37 +233,26 @@ namespace Lab01_SadieP
         /// <returns>true if this package contains the given package</returns>
         public bool ContainsPackage(Package package)
         {
-            //get the center point by avveraging the x and y values of all points in _lines
-            Point center = new Point(0,0);
-
-            //sum the X and Y values fore each point in _lines
-            foreach (Point p in _lines)
-            {
-                center.X += p.X;
-                center.Y += p.Y;
-            }
-
-            //divide the X and Y values by the number of points to get the average
-            center.X /= _lines.Count;
-            center.Y /= _lines.Count;
-
             //for each line segment in the given package
             for( int i = 0; i < package._lines.Count; i++)
             {
-                Point start = package._lines[i]; //the start of the line segment being checked
+                //
+                Point start = new Point(package._lines[i].X + package.Location.X, package._lines[i].Y + package.Location.Y);  //the start of the line segment being checked
                 Point end; //end of the line segment being checked
 
                 //if the start is the last point of package._lines, set the end point to the first point of package._lines
                 if (i == package._lines.Count - 1)
-                    end = package._lines[0];
+                    end = new Point(package._lines[0].X + package.Location.X, package._lines[0].Y + package.Location.Y);
                 else
-                    end = package._lines[i + 1];
+                    end = new Point(package._lines[i + 1].X + package.Location.X, package._lines[i + 1].Y + package.Location.Y);
 
                 //check if the line from center to every point on this package intersects the corrent line
-                foreach (Point edge in _lines)
+                foreach (Point vertex in _lines)
                 {
+                    //convert the vertex from a relative point to an absolute point on the canvas
+                    Point edge = new Point(vertex.X + Location.X, vertex.Y + Location.Y);
                     //if they intersect, return true because the package is inside this package
-                    if (LineIntersects(center, center, start, end))
+                    if (LineIntersects(Location, edge, start, end))
                         return true;
                 }
             }
